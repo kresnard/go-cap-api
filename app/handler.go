@@ -46,7 +46,12 @@ func getCustomers(w http.ResponseWriter, r *http.Request) {
 	customerId := vars["customer_id"]
 
 	// convert str to int
-	id, _ := strconv.Atoi(customerId)
+	// id, _ := strconv.Atoi(customerId)
+	id, err := strconv.Atoi(customerId)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprint(w, "invalid customer id")
+	}
 
 	// searching customer data
 	var cust Customer
@@ -57,8 +62,38 @@ func getCustomers(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// return customer data
+	// if cust.ID == 0 {
+	// 	w.WriteHeader(http.StatusNotFound)
+	// 	fmt.Fprint(w, "customer data not found")
+	// 	return
+	// }
+
+	// return customer datagit
 	w.Header().Add("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(cust)
 
+}
+
+func addCustomer(w http.ResponseWriter, r *http.Request) {
+	// decode request body
+	var cust Customer
+	json.NewDecoder(r.Body).Decode(&cust)
+
+	// generate new id
+	nextID := getNextID()
+	cust.ID = nextID
+
+	// save data to array
+	customers = append(customers, cust)
+
+	w.WriteHeader(http.StatusCreated)
+	fmt.Fprintln(w, "customer succesfully created")
+
+	// fmt.Println(cust)
+}
+
+func getNextID() int {
+	cust := customers[len(customers)-1]
+
+	return cust.ID + 1
 }
