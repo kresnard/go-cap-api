@@ -143,37 +143,6 @@ func updateCustomers(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// func updateCustomers(w http.ResponseWriter, r *http.Request) {
-// 	// get route variable
-// 	vars := mux.Vars(r)
-
-// 	customerId := vars["customer_id"]
-
-// 	// convert str to int
-// 	id, _ := strconv.Atoi(customerId)
-// 	// id, err := strconv.Atoi(customerId)
-// 	// if err != nil {
-// 	// 	w.WriteHeader(http.StatusBadRequest)
-// 	// 	fmt.Fprint(w, "invalid customer id")
-// 	// }
-
-// 	// searching customer data
-// 	var updateCustomers Customer
-
-// 	json.NewDecoder(r.Body).Decode(&updateCustomers)
-
-// 	for i, cust := range customers {
-// 		if cust.ID == id {
-// 			customers = append(customers[:i], customers[:i+1]...)
-// 			customers = append(customers, updateCustomers)
-// 		}
-// 	}
-// 	json.NewEncoder(w).Encode(customers)
-// 	w.WriteHeader(http.StatusOK)
-// 	fmt.Fprintln(w, "customer succesfully updated")
-
-// }
-
 func deleteCustomers(w http.ResponseWriter, r *http.Request) {
 	// get route variable
 	vars := mux.Vars(r)
@@ -200,3 +169,34 @@ func deleteCustomers(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprint(w, "customer data deleted")
 }
+
+// func updateCustomers(w http.ResponseWriter, r *http.Request) {
+// 	// get route variable
+// 	vars := mux.Vars(r)
+
+// 	customerId := vars["customer_id"]
+
+// 	// convert str to int
+// 	id, _ := strconv.Atoi(customerId)
+// 	// id, err := strconv.Atoi(customerId)
+// 	// if err != nil {
+// 	// 	w.WriteHeader(http.StatusBadRequest)
+// 	// 	fmt.Fprint(w, "invalid customer id")
+// 	// }
+
+// 	// searching customer data
+// 	var updateCustomers Customer
+
+// 	json.NewDecoder(r.Body).Decode(&updateCustomers)
+
+// 	for i, cust := range customers {
+// 		if cust.ID == id {
+// 			customers = append(customers[:i], customers[i+1:]...)
+// 			customers = append(customers, updateCustomers)
+// 		}
+// 	}
+// 	json.NewEncoder(w).Encode(customers)
+// 	w.WriteHeader(http.StatusOK)
+// 	fmt.Fprintln(w, "customer succesfully updated")
+
+// }
