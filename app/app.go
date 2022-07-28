@@ -13,7 +13,7 @@ func Start() {
 	mux := mux.NewRouter()
 
 	// wiring
-	ch := CustomerHandler{service.NewCustomerService(domain.NewCustomerRepositoryStub())}
+	ch := CustomerHandler{service.NewCustomerService(domain.NewCustomerRepositoryDB())}
 
 	// mux := http.NewServeMux()
 
@@ -24,7 +24,7 @@ func Start() {
 	mux.HandleFunc("/customer", ch.getAllCustomers).Methods(http.MethodGet)
 	// mux.HandleFunc("/customer", addCustomer).Methods(http.MethodPost)
 	// mux.HandleFunc("/customer/{customer_id}", getCustomers).Methods(http.MethodGet)
-	// mux.HandleFunc("/customer/{customer_id:[0-9]+}", getCustomers).Methods(http.MethodGet)
+	mux.HandleFunc("/customer/{customer_id:[0-9]+}", ch.getCustomerByID).Methods(http.MethodGet)
 	// mux.HandleFunc("/customer/{customer_id:[0-9]+}", updateCustomers).Methods(http.MethodPut)
 	// mux.HandleFunc("/customer/{customer_id:[0-9]+}", deleteCustomers).Methods(http.MethodDelete)
 

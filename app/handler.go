@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"net/http"
+
 	// "github.com/go-delve/delve/service"
+	"github.com/gorilla/mux"
 )
 
 // type Customer struct {
@@ -42,41 +44,29 @@ func (ch *CustomerHandler) getAllCustomers(w http.ResponseWriter, r *http.Reques
 	}
 }
 
-// func getCustomers(w http.ResponseWriter, r *http.Request) {
+func (ch *CustomerHandler) getCustomerByID(w http.ResponseWriter, r *http.Request) {
 
-// 	// get route variable
-// 	vars := mux.Vars(r)
+	// get route variable
+	vars := mux.Vars(r)
 
-// 	customerId := vars["customer_id"]
+	customerId := vars["customer_id"]
 
-// 	// convert str to int
-// 	// id, _ := strconv.Atoi(customerId)
-// 	id, err := strconv.Atoi(customerId)
-// 	if err != nil {
-// 		w.WriteHeader(http.StatusBadRequest)
-// 		fmt.Fprint(w, "invalid customer id")
-// 	}
+	customer, err := ch.service.GetCustomerByID(customerId)
+	if err != nil {
+		writeResponse(w, err.Code, err.AsMessage())
+		return
+	}
 
-// 	// searching customer data
-// 	var cust Customer
+	// return customer data
+	writeResponse(w, http.StatusOK, customer)
 
-// 	for _, data := range customers {
-// 		if data.ID == id {
-// 			cust = data
-// 		}
-// 	}
+}
 
-// 	// if cust.ID == 0 {
-// 	// 	w.WriteHeader(http.StatusNotFound)
-// 	// 	fmt.Fprint(w, "customer data not found")
-// 	// 	return
-// 	// }
-
-// 	// return customer datagit
-// 	w.Header().Add("Content-Type", "application/json")
-// 	json.NewEncoder(w).Encode(cust)
-
-// }
+func writeResponse(w http.ResponseWriter, code int, data interface{}) {
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(code)
+	json.NewEncoder(w).Encode(data)
+}
 
 // func addCustomer(w http.ResponseWriter, r *http.Request) {
 // 	// decode request body

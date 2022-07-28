@@ -1,5 +1,7 @@
 package domain
 
+import "capi/errs"
+
 type Customer struct {
 	ID          int    `json:"id" xml:"id"`
 	Name        string `json:"name" xml:"name"`
@@ -10,5 +12,6 @@ type Customer struct {
 }
 
 type CustomerRepository interface {
-	FindAll() ([]Customer, error)
+	FindAll() ([]Customer, *errs.AppErr)
+	FindByID(string) (*Customer, *errs.AppErr)
 }
