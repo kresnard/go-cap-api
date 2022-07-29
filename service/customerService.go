@@ -7,7 +7,7 @@ import (
 )
 
 type CustomerService interface {
-	GetAllCustomer() ([]domain.Customer, *errs.AppErr)
+	GetAllCustomer(string) (*[]dto.CustomerResponse, *errs.AppErr)
 	GetCustomerByID(string) (*dto.CustomerResponse, *errs.AppErr)
 }
 
@@ -15,9 +15,18 @@ type DefaultCustomerService struct {
 	repository domain.CustomerRepository
 }
 
-func (s DefaultCustomerService) GetAllCustomer() ([]domain.Customer, *errs.AppErr) {
+func (s DefaultCustomerService) GetAllCustomer(status string) (*[]dto.CustomerResponse, *errs.AppErr) {
 	// add process here
-	return s.repository.FindAll()
+	customers, err := s.repository.FindAll(status)
+	if err != nil {
+		return nil, errs.NewUnexpectedError("error query data to customer table")
+	}
+	var customerResponse []dto.CustomerResponse
+	for _, data := range customers {
+		customerResponse = append(customerResponse, data.ToDTO())
+	}
+	return &customerResponse, nil
+
 }
 
 func (s DefaultCustomerService) GetCustomerByID(customerID string) (*dto.CustomerResponse, *errs.AppErr) {
