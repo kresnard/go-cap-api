@@ -18,13 +18,16 @@ func (ch *CustomerHandler) getAllCustomers(w http.ResponseWriter, r *http.Reques
 
 	status := r.URL.Query().Get("status")
 
-	customers, err := ch.service.GetAllCustomer(status)
-	if err != nil {
-		writeResponse(w, err.Code, err.AsMessage())
-		return
+	if status == "" || status == "active" || status == "inactive" {
+		customers, err := ch.service.GetAllCustomer(status)
+		if err != nil {
+			writeResponse(w, err.Code, err.AsMessage())
+			return
+		}
+		writeResponse(w, http.StatusOK, customers)
+	} else {
+		writeResponse(w, http.StatusNotFound, "data not found")
 	}
-
-	writeResponse(w, http.StatusOK, customers)
 }
 
 func (ch *CustomerHandler) getCustomerByID(w http.ResponseWriter, r *http.Request) {
@@ -46,8 +49,8 @@ func (ch *CustomerHandler) getCustomerByID(w http.ResponseWriter, r *http.Reques
 }
 
 func writeResponse(w http.ResponseWriter, code int, data interface{}) {
-	w.WriteHeader(code)
 	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(code)
 	json.NewEncoder(w).Encode(data)
 }
 
