@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
@@ -50,23 +51,34 @@ func Start() {
 	// * setup repository
 	customerRepositoryDB := domain.NewCustomerRepositoryDB(dbClient)
 	accountRepositoryDB := domain.NewAccountRepositoryDB(dbClient)
+	authRepositoryDB := domain.NewAuthRepositoryDB(dbClient)
 
 	// * setup service
 	customerService := service.NewCustomerService(customerRepositoryDB)
 	accountService := service.NewAccountService(accountRepositoryDB)
+	authService := service.NewAuthService(authRepositoryDB)
 
 	// * setup handler
 	ch := CustomerHandlers{customerService}
 	ah := AccountHandler{accountService}
+	authH := AuthHandler{authService}
 
 	// * create ServeMux
 	mux := mux.NewRouter()
 
+	authR := mux.PathPrefix("/auth").Subrouter()
+	authR.HandleFunc("/login", authH.Login).Methods(http.MethodPost)
+
+	authR.Use(loggingMiddleware)
+
 	// * defining routes
+	// mux.HandleFunc("/auth/login", authH.Login).Methods(http.MethodPost)
 	mux.HandleFunc("/customers", ch.getAllCustomers).Methods(http.MethodGet)
 	mux.HandleFunc("/customers/{customer_id:[0-9]+}", ch.getCustomerByID).Methods(http.MethodGet)
 	mux.HandleFunc("/customers/{customer_id:[0-9]+}/accounts", ah.NewAccount).Methods(http.MethodPost)
 	mux.HandleFunc("/customers/{customer_id:[0-9]+}/accounts/{account_id:[0-9]+}", ah.MakeTransaction).Methods(http.MethodPost)
+
+	mux.Use(authMiddleware)
 
 	// * starting the server
 
@@ -92,4 +104,28 @@ func getClientDB() *sqlx.DB {
 	logger.Info("success connect to database...")
 
 	return db
+}
+
+func loggingMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		timer := time.Now()
+		next.ServeHTTP(w, r)
+		logger.Info(fmt.Sprintf("%v %v %v", r.Method, r.URL, time.Since(timer)))
+	})
+}
+
+func authMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		token := r.Header.Get("Authorization")
+
+		// split token -> ambil tokennya buang "Bearer" nya
+
+		// parsing token, err := jwt.Parse
+
+		// check token validation
+		logger.Info(token)
+
+		next.ServeHTTP(w, r)
+
+	})
 }
