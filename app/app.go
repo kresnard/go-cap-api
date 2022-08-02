@@ -4,11 +4,14 @@ import (
 	"capi/domain"
 	"capi/logger"
 	"capi/service"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
 	"github.com/joho/godotenv"
@@ -116,14 +119,31 @@ func loggingMiddleware(next http.Handler) http.Handler {
 
 func authMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		token := r.Header.Get("Authorization")
+		tokenString := r.Header.Get("Authorization")
 
 		// split token -> ambil tokennya buang "Bearer" nya
+		splitToken := strings.Split(tokenString, "Bearer ")
+		tokenString = splitToken[1]
+		fmt.Println("kresna ", tokenString)
 
 		// parsing token, err := jwt.Parse
+		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+			return []byte("rahasia"), nil
+		})
 
 		// check token validation
-		logger.Info(token)
+		fmt.Println("kresna ", token.Valid)
+		if token.Valid {
+			fmt.Println("Your token is valid!")
+		} else if errors.Is(err, jwt.ErrTokenMalformed) {
+			fmt.Println("That's not even a token")
+		} else if errors.Is(err, jwt.ErrTokenExpired) || errors.Is(err, jwt.ErrTokenNotValidYet) {
+			fmt.Println("Timing is everything")
+		} else {
+			fmt.Println("Couldn't handle this token:", err)
+		}
+
+		logger.Info(tokenString)
 
 		next.ServeHTTP(w, r)
 
