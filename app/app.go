@@ -124,7 +124,7 @@ func authMiddleware(next http.Handler) http.Handler {
 		// split token -> ambil tokennya buang "Bearer" nya
 		splitToken := strings.Split(tokenString, "Bearer ")
 		tokenString = splitToken[1]
-		fmt.Println("kresna ", tokenString)
+		// fmt.Println("kresna ", tokenString)
 
 		// parsing token, err := jwt.Parse
 		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
@@ -132,7 +132,7 @@ func authMiddleware(next http.Handler) http.Handler {
 		})
 
 		// check token validation
-		fmt.Println("kresna ", token.Valid)
+		// fmt.Println("kresna ", token.Valid)
 		if token.Valid {
 			fmt.Println("Your token is valid!")
 		} else if errors.Is(err, jwt.ErrTokenMalformed) {
@@ -142,7 +142,6 @@ func authMiddleware(next http.Handler) http.Handler {
 		} else {
 			fmt.Println("Couldn't handle this token:", err)
 		}
-
 		logger.Info(tokenString)
 
 		next.ServeHTTP(w, r)
