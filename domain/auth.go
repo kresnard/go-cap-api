@@ -14,7 +14,7 @@ type Login struct {
 	Role       string         `db:"role"`
 }
 
-type AccessTokenClains struct {
+type AccessTokenClaims struct {
 	Username   string   `json:"username"`
 	CustomerID string   `json:"customer_id"`
 	Accounts   []string `json:"account_numbers"`

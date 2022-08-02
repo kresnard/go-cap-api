@@ -30,7 +30,7 @@ func (s DefaultAuthService) Login(req dto.LoginRequest) (*dto.LoginResponse, *er
 	}
 
 	accounts := strings.Split(login.Accounts.String, ",")
-	claims := domain.AccessTokenClains{
+	claims := domain.AccessTokenClaims{
 		CustomerID: login.CustomerID.String,
 		Username:   login.Username,
 		Role:       login.Role,
